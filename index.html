@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obter elementos de forma assíncrona</title>
+</head>
+
+<style>
+    body {
+        display: flex;
+    }
+
+    .wrap {
+        width: 200px;
+        height: 200px;
+        margin: 12px;
+        border: 2px solid;
+        font-size: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<body>
+    <div class="wrap">
+        div
+    </div>
+
+    <script>
+        
+        setTimeout(() => {
+            const wrap = document.querySelector('.wrap');
+            
+            [...Array(3)].map((elem, index) => {
+                const wrapClone = wrap.cloneNode(true);
+                wrapClone.classList.add(`div${index + 1}`);
+                wrapClone.innerText = `div${index + 1}`;
+                document.querySelector('body').appendChild(wrapClone);
+            })
+        }, Math.floor(Math.random() * 5000));
+
+        async function getAsyncElement(selector, timeout = 30000) {
+            let elem = undefined;
+
+            return new Promise((resolve, reject) => {
+                if (!selector) return reject(`Error: Selector not defined`)
+
+                const interval = setInterval(() => {
+                    elem = document.querySelector(selector);
+                    if (elem) {
+                        clearInterval(interval);
+                        resolve(elem)
+                    }
+                }, 1);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    reject(`Error: Search time exceeded, ${selector} element not found.`)
+                }, timeout);
+            });
+        }
+
+        (async () => {
+            const div2 = await getAsyncElement(".div1");
+            div2.style.backgroundColor = "yellow";
+
+            const div3 = await getAsyncElement(".div2");
+            div3.style.backgroundColor = "red";
+
+            const div4 = await getAsyncElement(".div3");
+            div4.style.backgroundColor = "green";
+        })()
+
+    </script>
+</body>
+
+</html>
